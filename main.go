@@ -12,6 +12,17 @@ func main() {
 	type T struct {
 		T []*T
 	}
+	var cp func(*T) *T
+	cp = func(a *T) *T {
+		if a == nil {
+			return nil
+		}
+		b := &T{}
+		for _, v := range a.T {
+			b.T = append(b.T, cp(v))
+		}
+		return b
+	}
 	pop := func(a *T) *T {
 		if len(a.T) == 0 {
 			return nil
@@ -24,6 +35,7 @@ func main() {
 		a.T = append(a.T, b)
 	}
 	apply := func(a, b *T) *T {
+		a, b = cp(a), cp(b)
 		expression := &T{
 			T: []*T{b},
 		}
