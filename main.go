@@ -53,9 +53,8 @@ func main() {
 			expression.T = append(expression.T, v)
 		}
 		todo := &T{
-			T: []*T{},
+			T: []*T{expression},
 		}
-		todo.T = append(todo.T, expression)
 		for len(todo.T) > 0 {
 			f := pop(todo)
 			if len(f.T) < 3 {
