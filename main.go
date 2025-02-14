@@ -128,7 +128,12 @@ func main() {
 	fmt.Println("not true = false")
 	prnt(0, apply(_not, _true))
 	fmt.Println("not not = identity")
-	_identity := apply(_not, _not)
+	_identity := &T{
+		T: []*T{
+			_not,
+			_not,
+		},
+	}
 	prnt(0, _identity)
 	fmt.Println("identity false = false")
 	prnt(0, apply(_identity, _false))
