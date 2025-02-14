@@ -130,11 +130,11 @@ func main() {
 				T: []*T{
 					&T{
 						T: []*T{
-							//_false,
+							_true,
 							&T{},
 						},
 					},
-					//_true,
+					_false,
 				},
 			},
 		},
@@ -146,7 +146,11 @@ func main() {
 	fmt.Println("not not = identity")
 	/*_identity := &T{
 		T: []*T{
-			_not,
+			&T{
+				T: []*T{
+					_not,
+				},
+			},
 			_not,
 		},
 	}*/
