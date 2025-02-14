@@ -12,6 +12,16 @@ func main() {
 	type T struct {
 		T []*T
 	}
+	var prnt func(int, *T)
+	prnt = func(depth int, a *T) {
+		for i := 0; i < depth; i++ {
+			fmt.Printf(" ")
+		}
+		fmt.Println("T")
+		for _, v := range a.T {
+			prnt(depth+1, v)
+		}
+	}
 	var cp func(*T) *T
 	cp = func(a *T) *T {
 		if a == nil {
@@ -113,6 +123,8 @@ func main() {
 			},
 		},
 	}
-	fmt.Println(apply(_not, _false))
-	fmt.Println(apply(_not, _true))
+	fmt.Println("not false = true")
+	prnt(0, apply(_not, _false))
+	fmt.Println("not true = false")
+	prnt(0, apply(_not, _true))
 }
