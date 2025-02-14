@@ -123,17 +123,33 @@ func main() {
 			},
 		},
 	}
+	_identity := &T{
+		T: []*T{
+			&T{},
+			&T{
+				T: []*T{
+					&T{
+						T: []*T{
+							//_false,
+							&T{},
+						},
+					},
+					//_true,
+				},
+			},
+		},
+	}
 	fmt.Println("not false = true")
 	prnt(0, apply(_not, _false))
 	fmt.Println("not true = false")
 	prnt(0, apply(_not, _true))
 	fmt.Println("not not = identity")
-	_identity := &T{
+	/*_identity := &T{
 		T: []*T{
 			_not,
 			_not,
 		},
-	}
+	}*/
 	prnt(0, _identity)
 	fmt.Println("identity false = false")
 	prnt(0, apply(_identity, _false))
