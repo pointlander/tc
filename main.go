@@ -53,8 +53,9 @@ func main() {
 			expression.T = append(expression.T, v)
 		}
 		todo := &T{
-			T: []*T{expression},
+			T: []*T{},
 		}
+		todo.T = append(todo.T, expression)
 		for len(todo.T) > 0 {
 			f := pop(todo)
 			if len(f.T) < 3 {
@@ -100,6 +101,14 @@ func main() {
 		}
 		return expression
 	}
+	multi := func(x ...*T) *T {
+		length := len(x)
+		v := apply(x[length-2], x[length-1])
+		for i := length - 3; i >= 0; i-- {
+			v = apply(x[i], v)
+		}
+		return v
+	}
 
 	_false := &T{}
 	_true := &T{
@@ -143,18 +152,10 @@ func main() {
 	prnt(0, apply(_not, _false))
 	fmt.Println("not true = false")
 	prnt(0, apply(_not, _true))
-	fmt.Println("not not = identity")
-	/*_identity := &T{
-		T: []*T{
-			&T{
-				T: []*T{
-					_not,
-				},
-			},
-			_not,
-		},
-	}*/
-	prnt(0, _identity)
+	fmt.Println("not not false = false")
+	prnt(0, multi(_not, _not, _false))
+	fmt.Println("not not true = true")
+	prnt(0, multi(_not, _not, _true))
 	fmt.Println("identity false = false")
 	prnt(0, apply(_identity, _false))
 	fmt.Println("identity true = true")
