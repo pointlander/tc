@@ -319,7 +319,7 @@ func main() {
 				x.T = append(x.T, z)
 				y.T = append(y.T, z, x)
 				a = y
-			} else if len(a.T[0].T) == 1 {
+			} else if len(a.T[0].T[0].T) == 2 {
 				w := cp(a.T[0].T[0].T[0])
 				x := cp(a.T[0].T[0].T[1])
 				z := cp(a.T[2])
@@ -371,9 +371,34 @@ func main() {
 			},
 		}
 	}
+	d := func(x *T) *T {
+		x = cp(x)
+		return &T{
+			T: []*T{
+				&T{
+					T: []*T{
+						x,
+					},
+				},
+			},
+		}
+	}
+	and := func() *T {
+		i := I().T[0]
+		k := K()
+		k.T = append(k.T, i)
+		kk := K()
+		kk.T = append(kk.T, k)
+		return d(kk)
+	}
+	prnt(0, and())
+	_true := K().T[0]
+	_false := K().T[0]
+	_false.T = append(_false.T, I())
 
+	fmt.Println("KIxy")
 	k := K()
-	k.T = append(k.T, I(), &T{
+	k.T = append(k.T, I().T[0], &T{
 		T: []*T{
 			&T{Label: "X"},
 			&T{Label: "Y"},
@@ -381,4 +406,11 @@ func main() {
 	})
 	k = apply(k)
 	prnt(0, k)
+
+	fmt.Println("and")
+	a := and()
+	_ = _true
+	a.T = append(a.T, _true, _true)
+	a = apply(a)
+	prnt(0, a)
 }
