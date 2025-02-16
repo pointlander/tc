@@ -5,10 +5,17 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 )
 
-func main() {
+var (
+	// FlagOriginal original mode
+	FlagOriginal = flag.Bool("original", false, "original mode")
+)
+
+// Original mode
+func Original() {
 	type T struct {
 		T []*T
 	}
@@ -259,4 +266,13 @@ func main() {
 	prnt(0, apply(I(), _false))
 	fmt.Println("identity true = true")
 	prnt(0, apply(I(), _true))
+}
+
+func main() {
+	flag.Parse()
+
+	if *FlagOriginal {
+		Original()
+		return
+	}
 }
