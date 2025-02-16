@@ -275,4 +275,110 @@ func main() {
 		Original()
 		return
 	}
+
+	type T struct {
+		Label string
+		T     []*T
+	}
+	var prnt func(int, *T)
+	prnt = func(depth int, a *T) {
+		for i := 0; i < depth; i++ {
+			fmt.Printf("_")
+		}
+		if a.Label == "" {
+			fmt.Println("T")
+		} else {
+			fmt.Println(a.Label)
+		}
+		for _, v := range a.T {
+			prnt(depth+1, v)
+		}
+	}
+	var cp func(*T) *T
+	cp = func(a *T) *T {
+		if a == nil {
+			return nil
+		}
+		b := &T{
+			Label: a.Label,
+		}
+		for _, v := range a.T {
+			b.T = append(b.T, cp(v))
+		}
+		return b
+	}
+	var apply func(*T) *T
+	apply = func(a *T) *T {
+		for len(a.T) > 2 {
+			if len(a.T[0].T) == 0 {
+				a = cp(a.T[1])
+			} else if len(a.T[0].T) == 1 {
+				x := cp(a.T[0].T[0])
+				y := cp(a.T[1])
+				z := cp(a.T[2])
+				x.T = append(x.T, z)
+				y.T = append(y.T, z, x)
+				a = y
+			} else if len(a.T[0].T) == 1 {
+				w := cp(a.T[0].T[0].T[0])
+				x := cp(a.T[0].T[0].T[1])
+				z := cp(a.T[2])
+				w.T = append(z.T, w, x)
+				a = w
+			}
+		}
+		x := &T{
+			Label: a.Label,
+		}
+		for _, v := range a.T {
+			x.T = append(x.T, apply(v))
+		}
+		return x
+	}
+
+	K := func() *T {
+		return &T{
+			T: []*T{
+				&T{
+					T: []*T{
+						&T{},
+					},
+				},
+			},
+		}
+	}
+	I := func() *T {
+		return &T{
+			T: []*T{
+				&T{
+					T: []*T{
+						&T{
+							T: []*T{
+								&T{},
+							},
+						},
+					},
+				},
+				&T{
+					T: []*T{
+						&T{
+							T: []*T{
+								&T{},
+							},
+						},
+					},
+				},
+			},
+		}
+	}
+
+	k := K()
+	k.T = append(k.T, I(), &T{
+		T: []*T{
+			&T{Label: "X"},
+			&T{Label: "Y"},
+		},
+	})
+	k = apply(k)
+	prnt(0, k)
 }
