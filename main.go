@@ -15,7 +15,7 @@ func main() {
 	var prnt func(int, *T)
 	prnt = func(depth int, a *T) {
 		for i := 0; i < depth; i++ {
-			fmt.Printf(" ")
+			fmt.Printf("_")
 		}
 		fmt.Println("T")
 		for _, v := range a.T {
@@ -100,6 +100,62 @@ func main() {
 		}
 		return expression
 	}
+	apply2 := func(a, b, c *T) *T {
+		a, b, c = cp(a), cp(b), cp(c)
+		expression := &T{
+			T: []*T{c, b},
+		}
+		for _, v := range a.T {
+			expression.T = append(expression.T, v)
+		}
+		todo := &T{
+			T: []*T{expression},
+		}
+		for len(todo.T) > 0 {
+			f := pop(todo)
+			if len(f.T) < 3 {
+				continue
+			}
+			push(todo, f)
+			a, b, c := pop(f), pop(f), pop(f)
+			if length := len(a.T); length == 0 {
+				for _, v := range b.T {
+					push(f, v)
+				}
+			} else if length == 1 {
+				newPotRedex := &T{
+					T: []*T{c},
+				}
+				for _, v := range b.T {
+					newPotRedex.T = append(newPotRedex.T, v)
+				}
+				push(f, newPotRedex)
+				push(f, c)
+				for _, v := range a.T[0].T {
+					push(f, v)
+				}
+				push(todo, newPotRedex)
+			} else if length == 2 {
+				if length := len(c.T); length == 0 {
+					for _, v := range a.T[1].T {
+						push(f, v)
+					}
+				} else if length == 1 {
+					push(f, c.T[0])
+					for _, v := range a.T[0].T {
+						push(f, v)
+					}
+				} else if length == 2 {
+					push(f, c.T[0])
+					push(f, c.T[1])
+					for _, v := range b.T {
+						push(f, v)
+					}
+				}
+			}
+		}
+		return expression
+	}
 	multi := func(x ...*T) *T {
 		length := len(x)
 		v := apply(x[length-2], x[length-1])
@@ -107,6 +163,61 @@ func main() {
 			v = apply(x[i], v)
 		}
 		return v
+	}
+
+	K := func() *T {
+		return &T{
+			T: []*T{
+				&T{
+					T: []*T{
+						&T{},
+					},
+				},
+			},
+		}
+	}
+	I := func() *T {
+		return &T{
+			T: []*T{
+				&T{
+					T: []*T{
+						&T{
+							T: []*T{
+								&T{},
+							},
+						},
+					},
+				},
+				&T{
+					T: []*T{
+						&T{
+							T: []*T{
+								&T{},
+							},
+						},
+					},
+				},
+			},
+		}
+	}
+	d := func(x *T) *T {
+		return &T{
+			T: []*T{
+				&T{
+					T: []*T{
+						x,
+					},
+				},
+			},
+		}
+	}
+	and := func() *T {
+		i := I()
+		k := K()
+		k.T = append(k.T, i)
+		kk := K()
+		kk.T = append(kk.T, k)
+		return d(kk)
 	}
 
 	_false := &T{}
@@ -131,28 +242,11 @@ func main() {
 			},
 		},
 	}
-	_identity := &T{
-		T: []*T{
-			&T{
-				T: []*T{
-					&T{
-						T: []*T{
-							&T{},
-						},
-					},
-				},
-			},
-			&T{
-				T: []*T{
-					&T{
-						T: []*T{
-							&T{},
-						},
-					},
-				},
-			},
-		},
-	}
+
+	prnt(0, and())
+	fmt.Println()
+	prnt(0, apply2(and(), _false, _false))
+
 	fmt.Println("not false = true")
 	prnt(0, apply(_not, _false))
 	fmt.Println("not true = false")
@@ -162,7 +256,7 @@ func main() {
 	fmt.Println("not not true = true")
 	prnt(0, multi(_not, _not, _true))
 	fmt.Println("identity false = false")
-	prnt(0, apply(_identity, _false))
+	prnt(0, apply(I(), _false))
 	fmt.Println("identity true = true")
-	prnt(0, apply(_identity, _true))
+	prnt(0, apply(I(), _true))
 }
