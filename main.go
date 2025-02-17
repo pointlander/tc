@@ -307,6 +307,17 @@ func main() {
 		}
 		return b
 	}
+	var equal func(a, b *T) bool
+	equal = func(a, b *T) bool {
+		if len(a.T) != len(b.T) {
+			return false
+		}
+		e := true
+		for i, v := range a.T {
+			e = e && equal(v, b.T[i])
+		}
+		return e
+	}
 	hoist := func(a ...*T) *T {
 		return &T{
 			T: a,
@@ -415,7 +426,23 @@ func main() {
 	prnt(0, k)
 
 	fmt.Println("and")
-	_ = _true
-	a := apply(hoist(and(), _true, _true))
-	prnt(0, a)
+	cases := [][]*T{
+		{_true, _true, _true},
+		{_false, _true, _false},
+		{_true, _false, _false},
+		{_false, _false, _false},
+	}
+	outs := []string{
+		"true and true != true",
+		"false and true != false",
+		"true and false != false",
+		"false and false != false",
+	}
+	for i, v := range cases {
+		a := apply(hoist(and(), v[0], v[1]))
+		if !equal(a, v[2]) {
+			fmt.Println(outs[i])
+			prnt(0, a)
+		}
+	}
 }
