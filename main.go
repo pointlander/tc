@@ -307,24 +307,35 @@ func main() {
 		}
 		return b
 	}
+	hoist := func(a ...*T) *T {
+		return &T{
+			T: a,
+		}
+	}
 	var apply func(*T) *T
 	apply = func(a *T) *T {
 		for len(a.T) > 2 {
 			if len(a.T[0].T) == 0 {
-				a = cp(a.T[1])
+				a = a.T[1]
 			} else if len(a.T[0].T) == 1 {
-				x := cp(a.T[0].T[0])
-				y := cp(a.T[1])
-				z := cp(a.T[2])
-				x.T = append(x.T, z)
-				y.T = append(y.T, z, x)
-				a = y
+				x := a.T[0].T[0]
+				y := a.T[1]
+				z := a.T[2]
+				x = hoist(x, z)
+				if len(y.T) == 1 {
+					a = hoist(y.T[0], z, x)
+				} else {
+					a = hoist(y.T[0], y.T[1], hoist(z, x))
+				}
 			} else if len(a.T[0].T[0].T) == 2 {
-				w := cp(a.T[0].T[0].T[0])
-				x := cp(a.T[0].T[0].T[1])
-				z := cp(a.T[2])
-				w.T = append(z.T, w, x)
-				a = w
+				w := a.T[0].T[0].T[0]
+				x := a.T[0].T[0].T[1]
+				z := a.T[2]
+				if len(z.T) == 1 {
+					a = hoist(z.T[0], w, x)
+				} else {
+					a = hoist(z.T[0], z.T[1], hoist(w, x))
+				}
 			}
 		}
 		x := &T{
