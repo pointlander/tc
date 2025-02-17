@@ -415,9 +415,7 @@ func main() {
 	prnt(0, k)
 
 	fmt.Println("and")
-	a := and()
 	_ = _true
-	a.T = append(a.T, _true, _true)
-	a = apply(a)
+	a := apply(hoist(and(), _true, _true))
 	prnt(0, a)
 }
