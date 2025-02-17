@@ -350,11 +350,7 @@ func main() {
 	K := func() *T {
 		return &T{
 			T: []*T{
-				&T{
-					T: []*T{
-						&T{},
-					},
-				},
+				&T{},
 			},
 		}
 	}
@@ -395,26 +391,26 @@ func main() {
 		}
 	}
 	and := func() *T {
-		i := I().T[0]
+		i := I()
 		k := K()
-		k.T = append(k.T, i)
+		k = hoist(k, i)
 		kk := K()
-		kk.T = append(kk.T, k)
+		kk = hoist(kk, k)
 		return d(kk)
 	}
 	prnt(0, and())
-	_true := K().T[0]
-	_false := K().T[0]
+	_true := K()
+	_false := K()
 	_false.T = append(_false.T, I())
 
 	fmt.Println("KIxy")
 	k := K()
-	k.T = append(k.T, I().T[0], &T{
-		T: []*T{
+	k = hoist(k, I().T[0],
+		hoist(
 			&T{Label: "X"},
 			&T{Label: "Y"},
-		},
-	})
+		),
+	)
 	k = apply(k)
 	prnt(0, k)
 
