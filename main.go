@@ -327,9 +327,9 @@ func main() {
 				} else {
 					a = hoist(y.T[0], y.T[1], hoist(z, x))
 				}
-			} else if len(a.T[0].T[0].T) == 2 {
-				w := a.T[0].T[0].T[0]
-				x := a.T[0].T[0].T[1]
+			} else if len(a.T[0].T) == 2 {
+				w := a.T[0].T[0]
+				x := a.T[0].T[1]
 				z := a.T[2]
 				if len(z.T) == 1 {
 					a = hoist(z.T[0], w, x)
@@ -405,7 +405,7 @@ func main() {
 
 	fmt.Println("KIxy")
 	k := K()
-	k = hoist(k, I().T[0],
+	k = hoist(k, I(),
 		hoist(
 			&T{Label: "X"},
 			&T{Label: "Y"},
