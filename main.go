@@ -280,6 +280,22 @@ func main() {
 		L string
 		T []*T
 	}
+	var number func(*T, *[]byte)
+	number = func(a *T, results *[]byte) {
+		if a != nil {
+			*results = append(*results, 1)
+			t := make([]*T, len(a.T))
+			copy(t, a.T)
+			if len(t) == 1 {
+				t = append(t, nil)
+			}
+			for _, v := range t {
+				number(v, results)
+			}
+		} else {
+			*results = append(*results, 0)
+		}
+	}
 	var prnt func(int, *T)
 	prnt = func(depth int, a *T) {
 		for i := 0; i < depth; i++ {
@@ -446,4 +462,31 @@ func main() {
 			prnt(0, a)
 		}
 	}
+
+	fmt.Println("I")
+	results := []byte{}
+	number(I(), &results)
+	fmt.Println(results)
+	value := 0
+	scale := 1
+	for _, v := range results {
+		if v == 1 {
+			value += scale
+		}
+		scale *= 2
+	}
+	fmt.Println(value)
+	fmt.Println("K")
+	results = []byte{}
+	number(K(), &results)
+	fmt.Println(results)
+	value = 0
+	scale = 1
+	for _, v := range results {
+		if v == 1 {
+			value += scale
+		}
+		scale *= 2
+	}
+	fmt.Println(value)
 }
