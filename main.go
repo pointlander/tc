@@ -334,10 +334,17 @@ func main() {
 				x := a.T[0].T[0]
 				y := a.T[1]
 				z := a.T[2]
+				if len(x.T) == 0 {
+					x = hoist(x, z)
+				} else if len(x.T) == 1 {
+					x = hoist(x.T[0], z)
+				} else if len(x.T) == 2 {
+					x = hoist(x.T[0], x.T[1], z)
+				}
 				if len(y.T) == 1 {
-					a = hoist(y.T[0], z, hoist(x, z))
+					a = hoist(y.T[0], z, x)
 				} else {
-					a = hoist(y.T[0], y.T[1], hoist(z, hoist(x, z)))
+					a = hoist(y.T[0], y.T[1], hoist(z, x))
 				}
 			case 2:
 				w := a.T[0].T[0]
