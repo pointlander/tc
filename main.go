@@ -390,40 +390,27 @@ func main() {
 		}
 	}
 	d := func(x *T) *T {
-		x = cp(x)
 		return &T{
 			T: []*T{
-				&T{
-					T: []*T{
-						x,
-					},
-				},
+				x,
 			},
 		}
 	}
 	and := func() *T {
-		i := I()
-		k := K()
-		k = hoist(k, i)
-		kk := K()
-		kk = hoist(kk, k)
-		return d(kk)
+		return d(hoist(K(), hoist(K(), I())))
 	}
 	prnt(0, and())
 	_true := K()
-	_false := K()
-	_false.T = append(_false.T, I())
+	_false := hoist(K().T[0], I())
 
 	fmt.Println("KIxy")
-	k := K()
-	k = hoist(k, I(),
+	a := apply(hoist(K(), I(),
 		hoist(
 			&T{Label: "X"},
 			&T{Label: "Y"},
 		),
-	)
-	k = apply(k)
-	prnt(0, k)
+	))
+	prnt(0, a)
 
 	fmt.Println("and")
 	cases := [][]*T{
