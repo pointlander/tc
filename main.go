@@ -327,19 +327,19 @@ func main() {
 	var apply func(*T) *T
 	apply = func(a *T) *T {
 		for len(a.T) > 2 {
-			if len(a.T[0].T) == 0 {
+			switch len(a.T[0].T) {
+			case 0:
 				a = a.T[1]
-			} else if len(a.T[0].T) == 1 {
+			case 1:
 				x := a.T[0].T[0]
 				y := a.T[1]
 				z := a.T[2]
-				x = hoist(x, z)
 				if len(y.T) == 1 {
-					a = hoist(y.T[0], z, x)
+					a = hoist(y.T[0], z, hoist(x, z))
 				} else {
-					a = hoist(y.T[0], y.T[1], hoist(z, x))
+					a = hoist(y.T[0], y.T[1], hoist(z, hoist(x, z)))
 				}
-			} else if len(a.T[0].T) == 2 {
+			case 2:
 				w := a.T[0].T[0]
 				x := a.T[0].T[1]
 				z := a.T[2]
