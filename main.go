@@ -277,18 +277,18 @@ func main() {
 	}
 
 	type T struct {
-		Label string
-		T     []*T
+		L string
+		T []*T
 	}
 	var prnt func(int, *T)
 	prnt = func(depth int, a *T) {
 		for i := 0; i < depth; i++ {
 			fmt.Printf("_")
 		}
-		if a.Label == "" {
+		if a.L == "" {
 			fmt.Println("T")
 		} else {
-			fmt.Println(a.Label)
+			fmt.Println(a.L)
 		}
 		for _, v := range a.T {
 			prnt(depth+1, v)
@@ -300,7 +300,7 @@ func main() {
 			return nil
 		}
 		b := &T{
-			Label: a.Label,
+			L: a.L,
 		}
 		for _, v := range a.T {
 			b.T = append(b.T, cp(v))
@@ -320,6 +320,7 @@ func main() {
 	}
 	hoist := func(a ...*T) *T {
 		return &T{
+			L: "h",
 			T: a,
 		}
 	}
@@ -350,7 +351,7 @@ func main() {
 			}
 		}
 		x := &T{
-			Label: a.Label,
+			L: a.L,
 		}
 		for _, v := range a.T {
 			x.T = append(x.T, apply(v))
@@ -360,28 +361,40 @@ func main() {
 
 	K := func() *T {
 		return &T{
+			L: "K",
 			T: []*T{
-				&T{},
+				&T{
+					L: "K",
+				},
 			},
 		}
 	}
 	I := func() *T {
 		return &T{
+			L: "I",
 			T: []*T{
 				&T{
+					L: "I",
 					T: []*T{
 						&T{
+							L: "I",
 							T: []*T{
-								&T{},
+								&T{
+									L: "I",
+								},
 							},
 						},
 					},
 				},
 				&T{
+					L: "I",
 					T: []*T{
 						&T{
+							L: "I",
 							T: []*T{
-								&T{},
+								&T{
+									L: "I",
+								},
 							},
 						},
 					},
@@ -391,6 +404,7 @@ func main() {
 	}
 	d := func(x *T) *T {
 		return &T{
+			L: "d",
 			T: []*T{
 				x,
 			},
@@ -404,14 +418,14 @@ func main() {
 	_false := hoist(K().T[0], I())
 
 	fmt.Println("Kxy")
-	a := apply(hoist(K().T[0], &T{Label: "X"}, &T{Label: "Y"}))
+	a := apply(hoist(K().T[0], &T{L: "X"}, &T{L: "Y"}))
 	prnt(0, a)
 
 	fmt.Println("KIxy")
 	a = apply(hoist(K(), I(),
 		hoist(
-			&T{Label: "X"},
-			&T{Label: "Y"},
+			&T{L: "X"},
+			&T{L: "Y"},
 		),
 	))
 	prnt(0, a)
