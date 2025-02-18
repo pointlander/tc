@@ -403,8 +403,12 @@ func main() {
 	_true := K()
 	_false := hoist(K().T[0], I())
 
+	fmt.Println("Kxy")
+	a := apply(hoist(K().T[0], &T{Label: "X"}, &T{Label: "Y"}))
+	prnt(0, a)
+
 	fmt.Println("KIxy")
-	a := apply(hoist(K(), I(),
+	a = apply(hoist(K(), I(),
 		hoist(
 			&T{Label: "X"},
 			&T{Label: "Y"},
