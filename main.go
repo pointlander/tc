@@ -376,27 +376,13 @@ func main() {
 				&T{
 					L: "I",
 					T: []*T{
-						&T{
-							L: "I",
-							T: []*T{
-								&T{
-									L: "I",
-								},
-							},
-						},
+						&T{},
 					},
 				},
 				&T{
 					L: "I",
 					T: []*T{
-						&T{
-							L: "I",
-							T: []*T{
-								&T{
-									L: "I",
-								},
-							},
-						},
+						&T{},
 					},
 				},
 			},
@@ -406,23 +392,26 @@ func main() {
 		return &T{
 			L: "d",
 			T: []*T{
-				x,
+				&T{
+					L: "d",
+					T: []*T{x},
+				},
 			},
 		}
 	}
 	and := func() *T {
-		return d(hoist(K(), hoist(K(), I())))
+		return d(hoist(hoist(I(), K().T[0]), K().T[0]))
 	}
 	prnt(0, and())
 	_true := K()
-	_false := hoist(K().T[0], I())
+	_false := hoist(I(), K().T[0])
 
 	fmt.Println("Kxy")
 	a := apply(hoist(K().T[0], &T{L: "X"}, &T{L: "Y"}))
 	prnt(0, a)
 
 	fmt.Println("KIxy")
-	a = apply(hoist(K(), I(),
+	a = apply(hoist(I(), K().T[0],
 		hoist(
 			&T{L: "X"},
 			&T{L: "Y"},
