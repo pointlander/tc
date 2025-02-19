@@ -348,14 +348,11 @@ func main() {
 			}
 			switch len(a.T[0].T) {
 			case 0:
-				a = a.T[1]
+				a = apply(a.T[1])
 			case 1:
-				x := a.T[0].T[0]
-				y := a.T[1]
-				z := a.T[2]
-				if len(x.T) > 2 {
-					x = apply(x)
-				}
+				x := apply(a.T[0].T[0])
+				y := apply(a.T[1])
+				z := apply(a.T[2])
 				if len(x.T) == 0 {
 					x = hoist(x, z)
 				} else if len(x.T) == 1 {
@@ -364,9 +361,6 @@ func main() {
 					x = hoist(x.T[0], x.T[1], z)
 				} else {
 					panic(fmt.Errorf("len(x.T),%d > 2", len(x.T)))
-				}
-				if len(y.T) > 2 {
-					y = apply(y)
 				}
 				if len(y.T) == 0 {
 					a = hoist(y, z, x)
@@ -378,12 +372,9 @@ func main() {
 					panic(fmt.Errorf("len(y.T),%d > 2", len(y.T)))
 				}
 			case 2:
-				w := a.T[0].T[0]
-				x := a.T[0].T[1]
-				z := a.T[2]
-				if len(z.T) > 2 {
-					z = apply(z)
-				}
+				w := apply(a.T[0].T[0])
+				x := apply(a.T[0].T[1])
+				z := apply(a.T[2])
 				if len(z.T) == 0 {
 					a = hoist(z, w, x)
 				} else if len(z.T) == 1 {
@@ -395,13 +386,8 @@ func main() {
 				}
 			}
 		}
-		x := &T{
-			L: a.L,
-		}
-		for _, v := range a.T {
-			x.T = append(x.T, apply(v))
-		}
-		return x
+
+		return a
 	}
 
 	K := func() *T {
