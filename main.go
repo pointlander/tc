@@ -343,6 +343,9 @@ func main() {
 	var apply func(*T) *T
 	apply = func(a *T) *T {
 		for len(a.T) > 2 {
+			if len(a.T) > 3 {
+				panic(fmt.Errorf("len(a.T),%d > 3", len(a.T)))
+			}
 			switch len(a.T[0].T) {
 			case 0:
 				a = a.T[1]
@@ -350,30 +353,45 @@ func main() {
 				x := a.T[0].T[0]
 				y := a.T[1]
 				z := a.T[2]
+				if len(x.T) > 2 {
+					x = apply(x)
+				}
 				if len(x.T) == 0 {
 					x = hoist(x, z)
 				} else if len(x.T) == 1 {
 					x = hoist(x.T[0], z)
 				} else if len(x.T) == 2 {
 					x = hoist(x.T[0], x.T[1], z)
+				} else {
+					panic(fmt.Errorf("len(x.T),%d > 2", len(x.T)))
+				}
+				if len(y.T) > 2 {
+					y = apply(y)
 				}
 				if len(y.T) == 0 {
 					a = hoist(y, z, x)
 				} else if len(y.T) == 1 {
 					a = hoist(y.T[0], z, x)
-				} else {
+				} else if len(y.T) == 2 {
 					a = hoist(y.T[0], y.T[1], hoist(z, x))
+				} else {
+					panic(fmt.Errorf("len(y.T),%d > 2", len(y.T)))
 				}
 			case 2:
 				w := a.T[0].T[0]
 				x := a.T[0].T[1]
 				z := a.T[2]
+				if len(z.T) > 2 {
+					z = apply(z)
+				}
 				if len(z.T) == 0 {
 					a = hoist(z, w, x)
 				} else if len(z.T) == 1 {
 					a = hoist(z.T[0], w, x)
-				} else {
+				} else if len(z.T) == 2 {
 					a = hoist(z.T[0], z.T[1], hoist(w, x))
+				} else {
+					panic(fmt.Errorf("len(z.T),%d > 2", len(z.T)))
 				}
 			}
 		}
