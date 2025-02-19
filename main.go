@@ -357,7 +357,9 @@ func main() {
 				} else if len(x.T) == 2 {
 					x = hoist(x.T[0], x.T[1], z)
 				}
-				if len(y.T) == 1 {
+				if len(y.T) == 0 {
+					a = hoist(y, z, x)
+				} else if len(y.T) == 1 {
 					a = hoist(y.T[0], z, x)
 				} else {
 					a = hoist(y.T[0], y.T[1], hoist(z, x))
@@ -366,7 +368,9 @@ func main() {
 				w := a.T[0].T[0]
 				x := a.T[0].T[1]
 				z := a.T[2]
-				if len(z.T) == 1 {
+				if len(z.T) == 0 {
+					a = hoist(z, w, x)
+				} else if len(z.T) == 1 {
 					a = hoist(z.T[0], w, x)
 				} else {
 					a = hoist(z.T[0], z.T[1], hoist(w, x))
@@ -425,6 +429,9 @@ func main() {
 	and := func() *T {
 		return d(hoist(hoist(I(), K().T[0]), K().T[0]))
 	}
+	or := func() *T {
+		return hoist(I(), d(hoist(K(), K().T[0])).T[0])
+	}
 	prnt(0, and())
 	_true := K()
 	_false := hoist(I(), K().T[0])
@@ -457,6 +464,28 @@ func main() {
 	}
 	for i, v := range cases {
 		a := apply(hoist(and(), v[0], v[1]))
+		if !equal(a, v[2]) {
+			fmt.Println(outs[i])
+			prnt(0, a)
+		}
+	}
+
+	prnt(0, or())
+	fmt.Println("or")
+	cases = [][]*T{
+		{_true, _true, _true},
+		{_false, _true, _true},
+		{_true, _false, _true},
+		{_false, _false, _false},
+	}
+	outs = []string{
+		"true or true != true",
+		"false or true != true",
+		"true or false != true",
+		"false or false != false",
+	}
+	for i, v := range cases {
+		a := apply(hoist(hoist(or()), v[0], v[1]))
 		if !equal(a, v[2]) {
 			fmt.Println(outs[i])
 			prnt(0, a)
