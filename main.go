@@ -470,11 +470,88 @@ func main() {
 		return d(hoist(hoist(I(), K().T[0]), K().T[0]))
 	}
 	or := func() *T {
-		return hoist(hoist(I(), d(hoist(K(), K().T[0])).T[0]))
+		x := d(hoist(K(), K()))
+		x.T[0].T = []*T{I(), x.T[0].T[0]}
+		return x
+		//return hoist(hoist(I(), d(hoist(K(), K().T[0])).T[0]))
 	}
 	prnt(0, and())
 	_true := K()
 	_false := hoist(I(), K().T[0])
+	/*_or := &T{
+		L: "X",
+		T: []*T{
+			&T{
+				L: "X",
+				T: []*T{
+					&T{
+						L: "X",
+					},
+					&T{
+						L: "X",
+						T: []*T{
+							&T{},
+						},
+					},
+				},
+			},
+			&T{
+				L: "X",
+				T: []*T{
+					&T{
+						L: "X",
+						T: []*T{
+							&T{},
+						},
+					},
+					&T{
+						L: "X",
+						T: []*T{
+							&T{},
+						},
+					},
+				},
+			},
+		},
+	}*/
+	_or := &T{
+		L: "X",
+		T: []*T{
+			&T{
+				L: "X",
+				T: []*T{
+					&T{
+						L: "X",
+						T: []*T{
+							&T{},
+						},
+					},
+					&T{
+						L: "X",
+						T: []*T{
+							&T{},
+						},
+					},
+				},
+			},
+			&T{
+				L: "X",
+				T: []*T{
+					&T{
+						L: "X",
+						T: []*T{
+							&T{},
+						},
+					},
+					&T{
+						L: "X",
+					},
+				},
+			},
+		},
+	}
+	fmt.Println("or")
+	prnt(0, _or)
 
 	fmt.Println("Kxy")
 	a := apply(hoist(K().T[0], &T{L: "X"}, &T{L: "Y"}))
