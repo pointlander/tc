@@ -340,16 +340,26 @@ func main() {
 			T: a,
 		}
 	}
+	debug := false
 	var apply func(*T) *T
 	apply = func(a *T) *T {
+		if debug {
+			fmt.Println("apply")
+		}
 		for len(a.T) > 2 {
 			if len(a.T) > 3 {
 				panic(fmt.Errorf("len(a.T),%d > 3", len(a.T)))
 			}
 			switch len(a.T[0].T) {
 			case 0:
+				if debug {
+					fmt.Println(0)
+				}
 				a = apply(a.T[1])
 			case 1:
+				if debug {
+					fmt.Println(1)
+				}
 				x := apply(a.T[0].T[0])
 				y := apply(a.T[1])
 				z := apply(a.T[2])
@@ -368,10 +378,23 @@ func main() {
 					a = hoist(y.T[0], z, x)
 				} else if len(y.T) == 2 {
 					a = hoist(y.T[0], y.T[1], hoist(z, x))
+					/*y = apply(hoist(y.T[0], y.T[1], z))
+					if len(y.T) == 0 {
+						a = hoist(y, x)
+					} else if len(y.T) == 1 {
+						a = hoist(y.T[0], x)
+					} else if len(y.T) == 2 {
+						a = hoist(y.T[0], y.T[1], x)
+					} else {
+						panic(fmt.Errorf("len(y.T),%d > 2", len(y.T)))
+					}*/
 				} else {
 					panic(fmt.Errorf("len(y.T),%d > 2", len(y.T)))
 				}
 			case 2:
+				if debug {
+					fmt.Println(2)
+				}
 				w := apply(a.T[0].T[0])
 				x := apply(a.T[0].T[1])
 				z := apply(a.T[2])
@@ -381,12 +404,25 @@ func main() {
 					a = hoist(z.T[0], w, x)
 				} else if len(z.T) == 2 {
 					a = hoist(z.T[0], z.T[1], hoist(w, x))
+					/*z = apply(hoist(z.T[0], z.T[1], w))
+					if len(z.T) == 0 {
+						a = hoist(z, x)
+					} else if len(z.T) == 1 {
+						a = hoist(z.T[0], x)
+					} else if len(z.T) == 2 {
+						a = hoist(z.T[0], z.T[1], x)
+					} else {
+						panic(fmt.Errorf("len(z.T),%d > 2", len(z.T)))
+					}*/
 				} else {
 					panic(fmt.Errorf("len(z.T),%d > 2", len(z.T)))
 				}
 			}
 		}
 
+		if debug {
+			fmt.Println("return")
+		}
 		return a
 	}
 
@@ -434,7 +470,7 @@ func main() {
 		return d(hoist(hoist(I(), K().T[0]), K().T[0]))
 	}
 	or := func() *T {
-		return hoist(I(), d(hoist(K(), K().T[0])).T[0])
+		return hoist(hoist(I(), d(hoist(K(), K().T[0])).T[0]))
 	}
 	prnt(0, and())
 	_true := K()
@@ -489,7 +525,12 @@ func main() {
 		"false or false != false",
 	}
 	for i, v := range cases {
-		a := apply(hoist(hoist(or()), v[0], v[1]))
+		if i == 1 {
+			debug = true
+		} else {
+			debug = false
+		}
+		a := apply(hoist(or(), v[0], v[1]))
 		if !equal(a, v[2]) {
 			fmt.Println(outs[i])
 			prnt(0, a)
