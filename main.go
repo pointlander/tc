@@ -340,6 +340,11 @@ func main() {
 			T: a,
 		}
 	}
+	const (
+		X = 0
+		Y = 1
+		Z = 2
+	)
 	debug := false
 	var apply func(*T) *T
 	apply = func(a *T) *T {
@@ -350,19 +355,19 @@ func main() {
 			if len(a.T) > 3 {
 				panic(fmt.Errorf("len(a.T),%d > 3", len(a.T)))
 			}
-			switch len(a.T[0].T) {
+			switch len(a.T[X].T) {
 			case 0:
 				if debug {
 					fmt.Println(0)
 				}
-				a = apply(a.T[1])
+				a = apply(a.T[Y])
 			case 1:
 				if debug {
 					fmt.Println(1)
 				}
-				x := apply(a.T[0].T[0])
-				y := apply(a.T[1])
-				z := apply(a.T[2])
+				x := apply(a.T[X].T[0])
+				y := apply(a.T[Y])
+				z := apply(a.T[Z])
 				if len(x.T) == 0 {
 					x = hoist(x, z)
 				} else if len(x.T) == 1 {
@@ -395,9 +400,9 @@ func main() {
 				if debug {
 					fmt.Println(2)
 				}
-				w := apply(a.T[0].T[0])
-				x := apply(a.T[0].T[1])
-				z := apply(a.T[2])
+				w := apply(a.T[X].T[0])
+				x := apply(a.T[X].T[1])
+				z := apply(a.T[Z])
 				if len(z.T) == 0 {
 					a = hoist(z, w, x)
 				} else if len(z.T) == 1 {
