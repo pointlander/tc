@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 var (
@@ -44,5 +45,64 @@ func main() {
 		panic(err)
 	}
 
+	type T struct {
+		N int
+		T []*T
+	}
+	var parse func(int, []byte) (int, *T)
+	parse = func(i int, input []byte) (int, *T) {
+		t := &T{}
+		for i < len(input) {
+			switch input[i] {
+			case '(':
+				var tt *T
+				i, tt = parse(i+1, input)
+				t.T = append(t.T, tt)
+			case 't':
+				t.T = append(t.T, &T{})
+				i++
+			case ')':
+				return i + 1, t
+			default:
+				i++
+			}
+		}
+		return i, t
+	}
+	var prnt func(*T, *strings.Builder)
+	prnt = func(t *T, sb *strings.Builder) {
+		if len(t.T) == 0 {
+			sb.WriteString("t")
+			return
+		}
+		sb.WriteString("(")
+		for i, v := range t.T {
+			if i > 0 {
+				sb.WriteString(" ")
+			}
+			prnt(v, sb)
+		}
+		sb.WriteString(")")
+	}
+	show := func(t *T, sb *strings.Builder) {
+		if len(t.T) == 0 {
+			sb.WriteString("t ")
+			return
+		}
+		for i, v := range t.T {
+			if i > 0 {
+				sb.WriteString(" ")
+			}
+			prnt(v, sb)
+		}
+	}
+
 	fmt.Println(string(output))
+	_, t := parse(0, output)
+	var sb strings.Builder
+	show(t, &sb)
+	fmt.Println(sb.String())
+	if sb.String() != string(output) {
+		panic("incorrect parsing")
+	}
 }
