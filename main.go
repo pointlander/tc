@@ -6,6 +6,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"os/exec"
+	"path/filepath"
 )
 
 var (
@@ -26,4 +29,20 @@ func main() {
 		return
 	}
 
+	exe, err := filepath.Abs("../tricu/result/bin/tricu")
+	if err != nil {
+		panic(err)
+	}
+	f, err := filepath.Abs("../tricu/demos/size.tri")
+	if err != nil {
+		panic(err)
+	}
+	cmd := exec.Command(exe, "eval", "-f", f)
+
+	output, err := cmd.Output()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(output))
 }
