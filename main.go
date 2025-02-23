@@ -19,6 +19,84 @@ var (
 	FlagExperiment2 = flag.Bool("exp2", false, "experiment 2")
 )
 
+// T is a node in a natural tree
+type T struct {
+	N int
+	T []*T
+}
+
+// Parse parses a natural tree
+func Parse(i int, input []byte) (int, *T) {
+	var t *T
+	for i < len(input) {
+		switch input[i] {
+		case '(':
+			var tt *T
+			i, tt = Parse(i+1, input)
+			t.T = append(t.T, tt)
+		case 't':
+			if t == nil {
+				t = &T{}
+			} else {
+				t.T = append(t.T, &T{})
+			}
+			i++
+		case ')':
+			return i + 1, t
+		default:
+			i++
+		}
+	}
+	return i, t
+}
+
+// Label labels a natural tree
+func (t *T) Label(n int) int {
+	if n == 1 {
+		if len(t.T) == 0 {
+			t.N = n
+			return n + 1
+		}
+		n = t.T[0].Label(n)
+		t.N = n
+		if len(t.T) == 2 {
+			n = t.T[1].Label(n + 1)
+		}
+		return n + 1
+	}
+	t.N = n
+	for _, v := range t.T {
+		n = v.Label(n + 1)
+	}
+	return n
+}
+
+// String converts a natural tree to a string
+func (t *T) String() string {
+	var sb strings.Builder
+	var str func(*T)
+	str = func(t *T) {
+		if len(t.T) == 0 {
+			sb.WriteString("t")
+			return
+		}
+		sb.WriteString("(t")
+		for _, v := range t.T {
+			sb.WriteString(" ")
+			str(v)
+		}
+		sb.WriteString(")")
+	}
+	if t != nil {
+		sb.WriteString("t")
+	}
+	for _, v := range t.T {
+		sb.WriteString(" ")
+		str(v)
+	}
+	return sb.String()
+}
+
 func main() {
 	flag.Parse()
 
@@ -45,76 +123,6 @@ func main() {
 		panic(err)
 	}
 
-	type T struct {
-		N int
-		T []*T
-	}
-	var parse func(int, []byte) (int, *T)
-	parse = func(i int, input []byte) (int, *T) {
-		var t *T
-		for i < len(input) {
-			switch input[i] {
-			case '(':
-				var tt *T
-				i, tt = parse(i+1, input)
-				t.T = append(t.T, tt)
-			case 't':
-				if t == nil {
-					t = &T{}
-				} else {
-					t.T = append(t.T, &T{})
-				}
-				i++
-			case ')':
-				return i + 1, t
-			default:
-				i++
-			}
-		}
-		return i, t
-	}
-	var label func(int, *T) int
-	label = func(n int, t *T) int {
-		if n == 1 {
-			if len(t.T) == 0 {
-				t.N = n
-				return n + 1
-			}
-			n = label(n, t.T[0])
-			t.N = n
-			if len(t.T) == 2 {
-				n = label(n+1, t.T[1])
-			}
-			return n + 1
-		}
-		t.N = n
-		for _, v := range t.T {
-			n = label(n+1, v)
-		}
-		return n
-	}
-	var prnt func(*T, *strings.Builder)
-	prnt = func(t *T, sb *strings.Builder) {
-		if len(t.T) == 0 {
-			sb.WriteString("t")
-			return
-		}
-		sb.WriteString("(t")
-		for _, v := range t.T {
-			sb.WriteString(" ")
-			prnt(v, sb)
-		}
-		sb.WriteString(")")
-	}
-	show := func(t *T, sb *strings.Builder) {
-		if t != nil {
-			sb.WriteString("t")
-		}
-		for _, v := range t.T {
-			sb.WriteString(" ")
-			prnt(v, sb)
-		}
-	}
 	var labels func(int, *T)
 	labels = func(depth int, t *T) {
 		for i := 0; i < depth; i++ {
@@ -126,37 +134,8 @@ func main() {
 		}
 	}
 	fmt.Println(string(output))
-	_, t := parse(0, output)
-	var sb strings.Builder
-	show(t, &sb)
-	fmt.Println(sb.String())
-	if sb.String() != string(output) {
-		panic("incorrect parsing")
-	}
-	n := label(1, t)
+	_, t := Parse(0, output)
+	n := t.Label(1)
 	fmt.Println("n", n)
 	labels(0, t)
-
-	tt := &T{
-		T: []*T{
-			&T{
-				T: []*T{
-					&T{},
-					&T{
-						T: []*T{
-							&T{},
-						},
-					},
-				},
-			},
-			&T{
-				T: []*T{
-					&T{},
-				},
-			},
-		},
-	}
-	n = label(1, tt)
-	fmt.Println("n", n)
-	labels(0, tt)
 }
