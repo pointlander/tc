@@ -51,7 +51,7 @@ func main() {
 	}
 	var parse func(int, []byte) (int, *T)
 	parse = func(i int, input []byte) (int, *T) {
-		t := &T{}
+		var t *T
 		for i < len(input) {
 			switch input[i] {
 			case '(':
@@ -59,7 +59,11 @@ func main() {
 				i, tt = parse(i+1, input)
 				t.T = append(t.T, tt)
 			case 't':
-				t.T = append(t.T, &T{})
+				if t == nil {
+					t = &T{}
+				} else {
+					t.T = append(t.T, &T{})
+				}
 				i++
 			case ')':
 				return i + 1, t
@@ -69,34 +73,58 @@ func main() {
 		}
 		return i, t
 	}
+	var label func(int, *T) int
+	label = func(n int, t *T) int {
+		if n == 1 {
+			if len(t.T) == 0 {
+				t.N = n
+				return n + 1
+			}
+			n = label(n, t.T[0])
+			t.N = n
+			if len(t.T) == 2 {
+				n = label(n+1, t.T[1])
+			}
+			return n + 1
+		}
+		t.N = n
+		for _, v := range t.T {
+			n = label(n+1, v)
+		}
+		return n
+	}
 	var prnt func(*T, *strings.Builder)
 	prnt = func(t *T, sb *strings.Builder) {
 		if len(t.T) == 0 {
 			sb.WriteString("t")
 			return
 		}
-		sb.WriteString("(")
-		for i, v := range t.T {
-			if i > 0 {
-				sb.WriteString(" ")
-			}
+		sb.WriteString("(t")
+		for _, v := range t.T {
+			sb.WriteString(" ")
 			prnt(v, sb)
 		}
 		sb.WriteString(")")
 	}
 	show := func(t *T, sb *strings.Builder) {
-		if len(t.T) == 0 {
-			sb.WriteString("t ")
-			return
+		if t != nil {
+			sb.WriteString("t")
 		}
-		for i, v := range t.T {
-			if i > 0 {
-				sb.WriteString(" ")
-			}
+		for _, v := range t.T {
+			sb.WriteString(" ")
 			prnt(v, sb)
 		}
 	}
-
+	var labels func(int, *T)
+	labels = func(depth int, t *T) {
+		for i := 0; i < depth; i++ {
+			fmt.Printf(" ")
+		}
+		fmt.Printf("%d\n", t.N)
+		for _, v := range t.T {
+			labels(depth+1, v)
+		}
+	}
 	fmt.Println(string(output))
 	_, t := parse(0, output)
 	var sb strings.Builder
@@ -105,4 +133,30 @@ func main() {
 	if sb.String() != string(output) {
 		panic("incorrect parsing")
 	}
+	n := label(1, t)
+	fmt.Println("n", n)
+	labels(0, t)
+
+	tt := &T{
+		T: []*T{
+			&T{
+				T: []*T{
+					&T{},
+					&T{
+						T: []*T{
+							&T{},
+						},
+					},
+				},
+			},
+			&T{
+				T: []*T{
+					&T{},
+				},
+			},
+		},
+	}
+	n = label(1, tt)
+	fmt.Println("n", n)
+	labels(0, tt)
 }
