@@ -74,3 +74,30 @@ func TestLabel(t *testing.T) {
 	}
 	compare(tt, ttt)
 }
+
+func TestTriangulation(t *testing.T) {
+	tt := &T{
+		T: []*T{
+			&T{
+				T: []*T{
+					&T{},
+					&T{
+						T: []*T{
+							&T{},
+						},
+					},
+				},
+			},
+			&T{
+				T: []*T{
+					&T{},
+				},
+			},
+		},
+	}
+	n := tt.Label(1)
+	polygon := tt.Triangulation(n + 1)
+	for i, v := range polygon {
+		t.Log(i, v)
+	}
+}

@@ -97,6 +97,42 @@ func (t *T) String() string {
 	return sb.String()
 }
 
+// Triangulation performs triangulation based on binary tree
+func (t *T) Triangulation(size int) [][]int {
+	polygon := make([][]int, size)
+	polygon[0] = append(polygon[0], t.N)
+	polygon[t.N] = append(polygon[t.N], 0)
+	polygon[size-1] = append(polygon[size-1], t.N)
+	polygon[t.N] = append(polygon[t.N], size-1)
+	var tri func([][]int, *T, int)
+	tri = func(polygon [][]int, t *T, n int) {
+		for _, v := range t.T {
+			if t.N < n {
+				if v.N < t.N && t.N > 1 {
+					polygon[t.N] = append(polygon[t.N], 0)
+					polygon[0] = append(polygon[0], t.N)
+				} else if n-t.N > 1 {
+					polygon[t.N] = append(polygon[t.N], n)
+					polygon[n] = append(polygon[n], t.N)
+				}
+			} else {
+				if v.N > t.N && v.N < len(polygon)-1 {
+					polygon[t.N] = append(polygon[t.N], len(polygon)-1)
+					polygon[len(polygon)-1] = append(polygon[len(polygon)-1], t.N)
+				} else if n-t.N > 1 {
+					polygon[t.N] = append(polygon[t.N], n)
+					polygon[n] = append(polygon[n], t.N)
+				}
+			}
+			tri(polygon, v, n)
+		}
+	}
+	for _, v := range t.T {
+		tri(polygon, v, t.N)
+	}
+	return polygon
+}
+
 func main() {
 	flag.Parse()
 
@@ -136,6 +172,10 @@ func main() {
 	fmt.Println(string(output))
 	_, t := Parse(0, output)
 	n := t.Label(1)
-	fmt.Println("n", n)
+	fmt.Println("n", n, t.N)
 	labels(0, t)
+	polygon := t.Triangulation(n + 1)
+	for i, v := range polygon {
+		fmt.Println(i, v)
+	}
 }
