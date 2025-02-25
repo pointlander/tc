@@ -55,28 +55,38 @@ func Parse(input []byte, ii ...int) (int, *T) {
 }
 
 // Label labels a natural tree
-func (t *T) Label(nn ...int) int {
-	n := 1
-	if len(nn) == 1 {
-		n = nn[0]
-	}
-	if n == 1 {
-		if len(t.T) == 0 {
+func (t *T) Label() int {
+	var left func(*T, int) int
+	var right func(*T, int) int
+	left = func(t *T, n int) int {
+		switch len(t.T) {
+		case 0:
 			t.N = n
-			return n + 1
-		}
-		n = t.T[0].Label(n)
-		t.N = n
-		if len(t.T) == 2 {
-			n = t.T[1].Label(n + 1)
+		case 1:
+			n = left(t.T[0], n)
+			t.N = n
+		case 2:
+			n = left(t.T[0], n)
+			t.N = n
+			n = right(t.T[1], n+1)
 		}
 		return n + 1
 	}
-	t.N = n
-	for _, v := range t.T {
-		n = v.Label(n + 1)
+	right = func(t *T, n int) int {
+		switch len(t.T) {
+		case 0:
+			t.N = n
+		case 1:
+			t.N = n
+			n = right(t.T[0], n+1)
+		case 2:
+			n = left(t.T[0], n)
+			t.N = n
+			n = right(t.T[1], n+1)
+		}
+		return n
 	}
-	return n
+	return left(t, 1)
 }
 
 // String converts a natural tree to a string
@@ -113,31 +123,37 @@ func (t *T) Triangulation(size int) [][]int {
 	polygon[t.N] = append(polygon[t.N], 0)
 	polygon[size-1] = append(polygon[size-1], t.N)
 	polygon[t.N] = append(polygon[t.N], size-1)
-	var tri func([][]int, *T, int)
-	tri = func(polygon [][]int, t *T, n int) {
+	var tri func([][]int, *T, int, int, int)
+	tri = func(polygon [][]int, t *T, n, a, b int) {
 		for _, v := range t.T {
 			if t.N < n {
-				if v.N < t.N && t.N > 1 {
-					polygon[t.N] = append(polygon[t.N], 0)
-					polygon[0] = append(polygon[0], t.N)
-				} else if n-t.N > 1 {
-					polygon[t.N] = append(polygon[t.N], n)
-					polygon[n] = append(polygon[n], t.N)
+				if v.N < t.N && t.N > a {
+					polygon[t.N] = append(polygon[t.N], a)
+					polygon[a] = append(polygon[a], t.N)
+					tri(polygon, v, n, a, t.N)
+				} else if b > t.N {
+					polygon[t.N] = append(polygon[t.N], b)
+					polygon[b] = append(polygon[b], t.N)
+					tri(polygon, v, n, t.N, b)
 				}
 			} else {
-				if v.N > t.N && v.N < len(polygon)-1 {
-					polygon[t.N] = append(polygon[t.N], len(polygon)-1)
-					polygon[len(polygon)-1] = append(polygon[len(polygon)-1], t.N)
-				} else if n-t.N > 1 {
-					polygon[t.N] = append(polygon[t.N], n)
-					polygon[n] = append(polygon[n], t.N)
+				if v.N > t.N && t.N < a {
+					polygon[t.N] = append(polygon[t.N], a)
+					polygon[a] = append(polygon[a], t.N)
+					tri(polygon, v, n, a, t.N)
+				} else if b < t.N {
+					polygon[t.N] = append(polygon[t.N], b)
+					polygon[b] = append(polygon[b], t.N)
+					tri(polygon, v, n, t.N, b)
 				}
 			}
-			tri(polygon, v, n)
 		}
 	}
-	for _, v := range t.T {
-		tri(polygon, v, t.N)
+	if len(t.T) == 2 {
+		tri(polygon, t.T[0], t.N, 0, t.N)
+		tri(polygon, t.T[1], t.N, len(polygon)-1, t.N)
+	} else if len(t.T) == 1 {
+		tri(polygon, t.T[0], t.N, 0, t.N)
 	}
 	return polygon
 }

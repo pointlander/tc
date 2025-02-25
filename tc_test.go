@@ -63,6 +63,18 @@ func TestLabel(t *testing.T) {
 	if n != 8 {
 		t.Fatal("wrong number of nodes")
 	}
+	var labels func(int, *T)
+	labels = func(depth int, tt *T) {
+		prefix := ""
+		for i := 0; i < depth; i++ {
+			prefix += " "
+		}
+		t.Logf("%s%d\n", prefix, tt.N)
+		for _, v := range tt.T {
+			labels(depth+1, v)
+		}
+	}
+	labels(0, ttt)
 	var compare func(a, b *T)
 	compare = func(a, b *T) {
 		if a.N != b.N {
