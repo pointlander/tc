@@ -120,40 +120,37 @@ func (t *T) Triangulation(size int) [][]int {
 	size++
 	polygon := make([][]int, size)
 	polygon[0] = append(polygon[0], t.N)
-	polygon[t.N] = append(polygon[t.N], 0)
 	polygon[size-1] = append(polygon[size-1], t.N)
-	polygon[t.N] = append(polygon[t.N], size-1)
-	var tri func([][]int, *T, int, int, int)
-	tri = func(polygon [][]int, t *T, n, a, b int) {
+	var left func([][]int, *T, int, int)
+	left = func(polygon [][]int, t *T, a, b int) {
 		for _, v := range t.T {
-			if t.N < n {
-				if v.N < t.N && t.N > a {
-					polygon[t.N] = append(polygon[t.N], a)
-					polygon[a] = append(polygon[a], t.N)
-					tri(polygon, v, n, a, t.N)
-				} else if b > t.N {
-					polygon[t.N] = append(polygon[t.N], b)
-					polygon[b] = append(polygon[b], t.N)
-					tri(polygon, v, n, t.N, b)
-				}
+			if v.N < t.N {
+				polygon[t.N] = append(polygon[t.N], a)
+				left(polygon, v, a, t.N)
 			} else {
-				if v.N > t.N && t.N < a {
-					polygon[t.N] = append(polygon[t.N], a)
-					polygon[a] = append(polygon[a], t.N)
-					tri(polygon, v, n, a, t.N)
-				} else if b < t.N {
-					polygon[t.N] = append(polygon[t.N], b)
-					polygon[b] = append(polygon[b], t.N)
-					tri(polygon, v, n, t.N, b)
-				}
+				polygon[t.N] = append(polygon[t.N], b)
+				left(polygon, v, t.N, b)
+			}
+
+		}
+	}
+	var right func([][]int, *T, int, int)
+	right = func(polygon [][]int, t *T, a, b int) {
+		for _, v := range t.T {
+			if v.N > t.N {
+				polygon[t.N] = append(polygon[t.N], a)
+				right(polygon, v, a, t.N)
+			} else {
+				polygon[t.N] = append(polygon[t.N], b)
+				right(polygon, v, t.N, b)
 			}
 		}
 	}
 	if len(t.T) == 2 {
-		tri(polygon, t.T[0], t.N, 0, t.N)
-		tri(polygon, t.T[1], t.N, len(polygon)-1, t.N)
+		left(polygon, t.T[0], 0, t.N)
+		right(polygon, t.T[1], len(polygon)-1, t.N)
 	} else if len(t.T) == 1 {
-		tri(polygon, t.T[0], t.N, 0, t.N)
+		left(polygon, t.T[0], 0, t.N)
 	}
 	return polygon
 }
@@ -188,6 +185,9 @@ func ITriangulation(polygon [][]int) *T {
 				if contains(polygon[i], a) {
 					t.T = append(t.T, build(polygon, a, i))
 				}
+				if len(polygon[i]) > 0 {
+					break
+				}
 			}
 		}
 		if len(t.T) == 0 {
@@ -195,23 +195,28 @@ func ITriangulation(polygon [][]int) *T {
 				if contains(polygon[i], b) {
 					t.T = append(t.T, build(polygon, i, b))
 				}
+				if len(polygon[i]) > 0 {
+					break
+				}
 			}
 		}
 		return t
 	}
-	if root != 0 && root != len(polygon)-1 {
+	if root != 1 && root != len(polygon)-2 {
 		return &T{
 			T: []*T{
 				build(polygon, 0, root),
 				build(polygon, root, len(polygon)-1),
 			},
 		}
-	} else {
+	} else if root != 1 {
 		return &T{
 			T: []*T{
 				build(polygon, 0, root),
 			},
 		}
+	} else {
+		return &T{}
 	}
 }
 
