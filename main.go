@@ -26,13 +26,17 @@ type T struct {
 }
 
 // Parse parses a natural tree
-func Parse(i int, input []byte) (int, *T) {
+func Parse(input []byte, ii ...int) (int, *T) {
+	i := 0
+	if len(ii) == 1 {
+		i = ii[0]
+	}
 	var t *T
 	for i < len(input) {
 		switch input[i] {
 		case '(':
 			var tt *T
-			i, tt = Parse(i+1, input)
+			i, tt = Parse(input, i+1)
 			t.T = append(t.T, tt)
 		case 't':
 			if t == nil {
@@ -51,7 +55,11 @@ func Parse(i int, input []byte) (int, *T) {
 }
 
 // Label labels a natural tree
-func (t *T) Label(n int) int {
+func (t *T) Label(nn ...int) int {
+	n := 1
+	if len(nn) == 1 {
+		n = nn[0]
+	}
 	if n == 1 {
 		if len(t.T) == 0 {
 			t.N = n
@@ -99,6 +107,7 @@ func (t *T) String() string {
 
 // Triangulation performs triangulation based on binary tree
 func (t *T) Triangulation(size int) [][]int {
+	size++
 	polygon := make([][]int, size)
 	polygon[0] = append(polygon[0], t.N)
 	polygon[t.N] = append(polygon[t.N], 0)
@@ -170,11 +179,11 @@ func main() {
 		}
 	}
 	fmt.Println(string(output))
-	_, t := Parse(0, output)
-	n := t.Label(1)
+	_, t := Parse(output)
+	n := t.Label()
 	fmt.Println("n", n, t.N)
 	labels(0, t)
-	polygon := t.Triangulation(n + 1)
+	polygon := t.Triangulation(n)
 	for i, v := range polygon {
 		fmt.Println(i, v)
 	}

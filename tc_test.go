@@ -10,7 +10,7 @@ import (
 
 func TestParse(t *testing.T) {
 	input := []byte("t t (t (t t) (t (t t) (t t (t t (t t (t (t t) (t (t t) (t (t t) t))))))))")
-	_, tt := Parse(0, input)
+	_, tt := Parse(input)
 	if tt.String() != string(input) {
 		t.Fatal("parsing failed")
 	}
@@ -59,7 +59,7 @@ func TestLabel(t *testing.T) {
 			},
 		},
 	}
-	n := ttt.Label(1)
+	n := ttt.Label()
 	if n != 8 {
 		t.Fatal("wrong number of nodes")
 	}
@@ -95,8 +95,8 @@ func TestTriangulation(t *testing.T) {
 			},
 		},
 	}
-	n := tt.Label(1)
-	polygon := tt.Triangulation(n + 1)
+	n := tt.Label()
+	polygon := tt.Triangulation(n)
 	for i, v := range polygon {
 		t.Log(i, v)
 	}
