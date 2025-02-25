@@ -158,6 +158,63 @@ func (t *T) Triangulation(size int) [][]int {
 	return polygon
 }
 
+func ITriangulation(polygon [][]int) *T {
+	contains := func(list []int, i int) bool {
+		for _, value := range list {
+			if value == i {
+				return true
+			}
+		}
+		return false
+	}
+	root := 0
+	for _, v := range polygon[0] {
+		if contains(polygon[len(polygon)-1], v) {
+			root = v
+			break
+		}
+	}
+	var build func([][]int, int, int) *T
+	build = func(polygon [][]int, a, b int) *T {
+		t := &T{}
+		for i := a + 1; i < b; i++ {
+			if contains(polygon[i], a) && contains(polygon[i], b) {
+				t.T = append(t.T, build(polygon, a, i))
+				t.T = append(t.T, build(polygon, i, b))
+			}
+		}
+		if len(t.T) == 0 {
+			for i := b - 1; i > a; i-- {
+				if contains(polygon[i], a) {
+					t.T = append(t.T, build(polygon, a, i))
+				}
+			}
+		}
+		if len(t.T) == 0 {
+			for i := a + 1; i < b; i++ {
+				if contains(polygon[i], b) {
+					t.T = append(t.T, build(polygon, i, b))
+				}
+			}
+		}
+		return t
+	}
+	if root != 0 && root != len(polygon)-1 {
+		return &T{
+			T: []*T{
+				build(polygon, 0, root),
+				build(polygon, root, len(polygon)-1),
+			},
+		}
+	} else {
+		return &T{
+			T: []*T{
+				build(polygon, 0, root),
+			},
+		}
+	}
+}
+
 func main() {
 	flag.Parse()
 

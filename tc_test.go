@@ -107,9 +107,27 @@ func TestTriangulation(t *testing.T) {
 			},
 		},
 	}
-	n := tt.Label()
-	polygon := tt.Triangulation(n)
-	for i, v := range polygon {
-		t.Log(i, v)
+	test := func(tt *T) {
+		n := tt.Label()
+		polygon := tt.Triangulation(n)
+		for i, v := range polygon {
+			t.Log(i, v)
+		}
+		ttt := ITriangulation(polygon)
+		var compare func(a, b *T)
+		compare = func(a, b *T) {
+			if len(a.T) != len(b.T) {
+				t.Fatal("node is mismatched")
+			}
+			for i, v := range a.T {
+				compare(v, b.T[i])
+			}
+		}
+		compare(tt, ttt)
 	}
+	test(tt)
+
+	input := []byte("t t (t (t t) (t (t t) (t t (t t (t t (t (t t) (t (t t) (t (t t) t))))))))")
+	_, tt = Parse(input)
+	test(tt)
 }
