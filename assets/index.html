@@ -7,18 +7,20 @@
 <body>
  <canvas id="myCanvas" width="512" height="512"></canvas>
  <form id="form">
-  <input type="text" id="text" name="text"/><br/>
+  <textarea cols="80" rows="10" id="text" name="text" wrap="soft"></textarea><br/>
   <input type="submit"/>
  </form>
  <script src="wasm_exec.js"></script>
  <script type="text/javascript">
+  document.getElementById('text').value = 't (t (t (t t (t (t (t (t (t (t (t t)) t)) (t (t (t t)) t)))))) (t (t (t t (t t))) (t (t (t t)) t)))';
   const go = new Go();
   WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
    go.run(result.instance);
   });
   function submit(event) {
    event.preventDefault();
-   draw("myCanvas", "t t (t (t t) (t (t t) (t t (t t (t t (t (t t) (t (t t) (t (t t) t))))))))");
+   tree = document.getElementById('text').value;
+   draw("myCanvas", tree);
    return false;
   }
   var form = document.getElementById("form");
