@@ -58,7 +58,11 @@ func Draw(id, tree string) string {
 			-(radius-8)*math.Cos(offset+float64(i)*segment)+width/2,
 			(radius-8)*math.Sin(offset+float64(i)*segment)+height/2,
 			8, 0, 2*math.Pi, true)
-		context.Set("fillStyle", "blue")
+		if i == 0 || i == len(polygon)-1 {
+			context.Set("fillStyle", "green")
+		} else {
+			context.Set("fillStyle", "blue")
+		}
 		context.Call("fill")
 	}
 	return tree

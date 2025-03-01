@@ -12,7 +12,7 @@
  </form>
  <script src="wasm_exec.js"></script>
  <script type="text/javascript">
-  document.getElementById('text').value = 't (t (t (t t (t (t (t (t (t (t (t t)) t)) (t (t (t t)) t)))))) (t (t (t t (t t))) (t (t (t t)) t)))';
+  document.getElementById('text').value = 't (t (t (t t (t (t (t (t (t (t (t t)) t)) (t (t (t t)) t)))))) (t (t (t t (t t))) (t (t (t t)) t))) (t (t (t t (t (t (t (t (t (t (t t)) t)) (t (t (t t)) t)))))) (t (t (t t (t t))) (t (t (t t)) t)))';
   const go = new Go();
   WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
    go.run(result.instance);
